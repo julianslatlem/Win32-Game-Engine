@@ -25,15 +25,40 @@ namespace GameEngine {
 		S = 83,
 
 		W = 87,
+
+		A = 65,
+		D = 68,
 	};
 
 	class Input {
 	public:
 		bool GetKeyDown(KeyCode key)
 		{
-			if (WindowsWindow::keyCode == key)
+			if (WindowsWindow::keyCode == key && WindowsWindow::isDown)
 			{
 				return true;
+			}
+
+			return false;
+		}
+
+		bool pressed = false;
+
+		bool GetKey(KeyCode key) 
+		{
+			if (WindowsWindow::keyCode == key)
+			{
+				if (!pressed) {
+					pressed = true;
+					return true;
+				}
+				else return false;
+				pressed = true;
+			}
+			else if (WindowsWindow::keyCode == NULL)
+			{
+				pressed = false;
+				return false;
 			}
 
 			return false;

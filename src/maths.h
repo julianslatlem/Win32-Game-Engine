@@ -16,6 +16,19 @@ public:
 	float y;
 };
 
+class Vector2Int {
+public:
+	int x;
+	int y;
+};
+
+class Vector3Int {
+public:
+	int x;
+	int y;
+	int z;
+};
+
 namespace GameEngine {
 
 

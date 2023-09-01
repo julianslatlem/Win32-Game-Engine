@@ -6,129 +6,85 @@ namespace GameEngine {
 		
 		Window window;
 
-		Rectangle player1;
-		Rectangle player2;
-		Rectangle ball;
+		Rectangle testRect;
+		Rectangle testRect2;
 
-		Rectangle line;
-
-		int score1;
-		int score2;
-
-		Vector2 ballVelocity {
-			-5.0f,
-			2.0f,
+		Vector2Int grid {
+			10,
+			20,
 		};
 
-		float player1Y;
+		Vector2Int shape1[3]{
+			(0, 0),
+			(1, 0),
+			(2, 0),
+		};
 
-		float player1YOffset;
+		const char* testShape = {
+			"dd"
+			"dd"
+		};
 
-		float player2Y;
+		Rectangle gridX[10];
+		Rectangle gridY[20];
 
-		float player2YOffset;
+		int offsetTestY = 5;
+		int offsetTestX = 5;
 
-		void Start()
-		{
-			window.Init(1920, 1080, L"Dong");
-
-			player1.SetSize(10, 200);
-
-			player1.SetPosition(20, (window.GetHeight() / 2) - (player1.height / 2));
-
-			player2.SetSize(10, 200);
-
-			player2.position.x = window.GetWidth() - (20 + player2.width / 2);
-			player2Y = (window.GetHeight() / 2) - (player2.height / 2);
-
-			ball.SetSize(10, 10);
-
-			ball.SetPosition(window.GetWidth() / 2 - ball.height / 2, window.GetHeight() / 2 - ball.width / 2);
+		void Start() {
+			window.Init(360, 720, L"Tettfis");
 		}
 
-		void Update()
-		{
-			if (Input.GetKeyDown(W) && player1.position.y < window.GetHeight() - player1.height)
-			{
-				player1YOffset += 4;
-			}
-			if (Input.GetKeyDown(S) && player1.position.y > 0)
-			{
-				player1YOffset -= 4;
-			}
+		int y = 0;
 
-			if (Input.GetKeyDown(UP) && player2.position.y < window.GetHeight() - player2.height)
-			{
-				player2YOffset += 4;
+		void Update() {
+
+			if (y >= 1500) {
+				//offsetTestY -= 1;
+				y = 0;
 			}
-			if (Input.GetKeyDown(DOWN) && player2.position.y > 0)
-			{
-				player2YOffset -= 4;
+			y++;
+
+			if (Input.GetKeyDown(DOWN)) {
+				y += 5;
 			}
 
-			if (ball.position.y >= window.GetHeight() - ball.height || ball.position.y <= 0)
-			{
-				ballVelocity.y *= -1;
+			if (Input.GetKey(DOWN) && testRect.position.y > 0 || Input.GetKey(S) && testRect.position.y > 0) {
+				offsetTestY -= 1;
+			}
+			if (Input.GetKey(UP) && testRect.position.y < window.GetHeight() - testRect.height || Input.GetKey(W) && testRect.position.y < window.GetHeight() - testRect.height) {
+				offsetTestY += 1;
+			}
+			if (Input.GetKey(RIGHT) && testRect.position.x < window.GetWidth() - testRect.width || Input.GetKey(D) && testRect.position.x < window.GetWidth() - testRect.width) {
+				offsetTestX += 1;
+			}
+			if (Input.GetKey(LEFT) && testRect.position.x > 0 || Input.GetKey(A) && testRect.position.x > 0) {
+				offsetTestX -= 1;
 			}
 
-			if (ball.position.x <= 0 + player1.width + ball.width && ball.position.x > 0)
-			{
-				if (ball.position.y >= player1.position.y && ball.position.y + ball.height < player1.position.y + player1.height)
-				{
-					ballVelocity.x *= -1;
-				}
-				else
-				{
-					ball.position.x = (window.GetWidth() / 2) - (ball.height / 2);
-					ball.position.y = (window.GetHeight() / 2) - (ball.width / 2);
+			testRect.SetSize(window.GetWidth() / grid.x * 1, window.GetHeight() / grid.y);
+			testRect.SetPosition(offsetTestX * (window.GetWidth() / grid.x), offsetTestY * (window.GetHeight() / grid.y));
 
-					ballVelocity.x *= -1;
-					ballVelocity.y *= -1;
+			testRect2.SetSize(window.GetWidth() / grid.x, window.GetHeight() / grid.y);
+			testRect2.SetPosition(1 * (window.GetWidth() / grid.x), 3 * (window.GetHeight() / grid.y));
 
-					score2++;
-
-					std::cout << "\33[2K\r";
-
-					std::cout << "Player 1: " << score1 << " Player 2: " << score2;
-				}
+			int i = 1;
+			while (i < grid.x) {
+				gridX[i].SetPosition(i * (window.GetWidth() / grid.x), 0);
+				gridX[i].SetSize(1, window.GetHeight());
+				gridX[i].Draw(0x1f1f1f);
+				i++;
 			}
 
-			if (ball.right >= (window.GetWidth() - (window.GetWidth() - player2.position.x)))
-			{
-				if (ball.position.y >= player2.position.y && ball.top < player2.position.y + player2.height)
-				{
-					ballVelocity.x *= -1;
-				}
-				else 
-				{
-					ball.position.x = (window.GetWidth() / 2) - (ball.height / 2);
-					ball.position.y = (window.GetHeight() / 2) - (ball.width / 2);
-
-					ballVelocity.x *= -1;
-					ballVelocity.y *= -1;
-
-					score1++;
-
-					std::cout << "\33[2K\r";
-					std::cout << "Player 1: " << score1 << " Player 2: " << score2;
-				}
+			int x = 1;
+			while (x < grid.y) {
+				gridY[x].SetPosition(0, x * (window.GetHeight() / grid.y));
+				gridY[x].SetSize(window.GetWidth(), 1);
+				gridY[x].Draw(0x1f1f1f);
+				x++;
 			}
 
-			player1.SetPosition(20, player1Y + player1YOffset);
-
-			player2.SetPosition(window.GetWidth() - (20 + player2.width / 2), player2Y + player2YOffset);
-
-			ball.SetPosition(ball.position.x + ballVelocity.x, ball.position.y + ballVelocity.y);
-
-			line.SetSize(1, window.GetHeight());
-			line.SetPosition(window.GetWidth() / 2 - line.width, 0);
-
-			line.Draw(0xffffff);
-
-			player1.Draw(0xffffff);
-			player2.Draw(0xffffff);
-
-			ball.Draw(0xffffff);
+			testRect.Draw(0xffffff);
 		}
 	};
 }
