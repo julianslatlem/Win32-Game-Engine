@@ -1,9 +1,11 @@
 #include "engine.h"
+#include <thread>
+#include <chrono>
 
 namespace GameEngine {
 	class Game : public Script {
 	public:
-		
+
 		Window window;
 
 		Rectangle player1;
@@ -15,7 +17,7 @@ namespace GameEngine {
 		int score1;
 		int score2;
 
-		Vector2 ballVelocity {
+		Vector2 ballVelocity{
 			-5.0f,
 			2.0f,
 		};
@@ -27,6 +29,13 @@ namespace GameEngine {
 		float player2Y;
 
 		float player2YOffset;
+
+		float getCurrentTime()
+		{
+			auto now = std::chrono::high_resolution_clock::now();
+			auto duration = now.time_since_epoch();
+			return std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000000.0f;
+		}
 
 		void Start()
 		{
@@ -48,6 +57,24 @@ namespace GameEngine {
 
 		void Update()
 		{
+			static const float MAX_FRAME_RATE = 400.0f;
+			static const float MIN_FRAME_TIME = 1.0f / MAX_FRAME_RATE;
+
+			static float lastFrameTime = getCurrentTime();
+
+			float currentTime = getCurrentTime();
+			float deltaTime = currentTime - lastFrameTime;
+
+			if (deltaTime < MIN_FRAME_TIME) {
+				float delayTime = MIN_FRAME_TIME - deltaTime;
+				std::chrono::microseconds delayMicros((int)(delayTime * 1000000));
+				std::this_thread::sleep_for(delayMicros);
+				currentTime = getCurrentTime();
+				deltaTime = currentTime - lastFrameTime;
+			}
+
+			lastFrameTime = currentTime;
+
 			if (Input.GetKeyDown(W) && player1.position.y < window.GetHeight() - player1.height)
 			{
 				player1YOffset += 4;
@@ -99,7 +126,7 @@ namespace GameEngine {
 				{
 					ballVelocity.x *= -1;
 				}
-				else 
+				else
 				{
 					ball.position.x = (window.GetWidth() / 2) - (ball.height / 2);
 					ball.position.y = (window.GetHeight() / 2) - (ball.width / 2);
@@ -129,6 +156,8 @@ namespace GameEngine {
 			player2.Draw(0xffffff);
 
 			ball.Draw(0xffffff);
+
+			lastFrameTime = currentTime;
 		}
 	};
 }
